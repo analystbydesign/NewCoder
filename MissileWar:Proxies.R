@@ -51,6 +51,15 @@ head(russiam)
 summary(russiam)
 head(russiam)
 
+# Import the data set (China_Missile_Capabilities.xlsx)
+# Set your working directory.
+chinam <- openxlsx::read.xlsx('China_Missile_Capabilities.xlsx', sheet = 1)
+
+# View top 6 rows.
+head(chinam)
+summary(chinam)
+head(chinam)
+
 # Import the data set (USA_Missile_Capabilities.xlsx)
 # Set your working directory.
 usam  <- openxlsx::read.xlsx('USA_Missile_Capabilities.xlsx', sheet = 1)
@@ -83,49 +92,6 @@ ggplot(missile_data, aes(x = AvgPayloadKG, y = AvgRangeKM, label = Country)) +
   ) +
   theme_minimal()
 #################
-# 1. Install tidyverse
-install.packages("tidyverse")
-
-# 2. Load tidyverse (includes tidyr)
-library(tidyverse)
-
-# 3. Reshape the data
-usa_long <- usa_missiles %>%
-  pivot_longer(cols = -Missile,
-               names_to = "Metric",
-               values_to = "Value")
-
-# 4. View result
-print(usa_long)
-
-
-# one graph is interceptors and the other is just ballistic missiles
-
-
-# Install if needed (only once)
-install.packages("reshape2")
-
-# Load the package quietly
-suppressPackageStartupMessages(library(reshape2))
-
-# Create dataset
-usa_missiles <- data.frame(
-  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
-  Payload_KG = c(1100, 2800, 500, 1100),
-  Range_KM = c(12000, 12000, 300, 12000)
-)
-
-# Reshape data using melt()
-usa_long <- melt(usa_missiles, 
-                 id.vars = "Missile", 
-                 variable.name = "Metric", 
-                 value.name = "Value")
-
-# View reshaped data
-print(usa_long)
-
-# Load necessary package
-library(ggplot2)
 
 # Create dataset
 missile_data <- data.frame(
@@ -183,7 +149,7 @@ ggplot(ballistic_data, aes(x = AvgPayloadKG, y = AvgRangeKM, label = Country)) +
   ) +
   theme_minimal()
 
-
+####
 
 
 # Filter interceptors
@@ -199,21 +165,21 @@ ggplot(interceptor_data, aes(x = AvgPayloadKG, y = AvgRangeKM, label = Country))
   ) +
   theme_minimal()
 
-######
+#### iran 
+library(tidyverse)
 
-# Create grouped bar chart
-ggplot(iran_long, aes(x = Missile, y = Value, fill = Metric)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(
-    title = "Iranian Ballistic Missiles: Payload and Range",
-    x = "Missile System",
-    y = "Value (kg or km)",
-    fill = "Metric"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Define the Israel missile data
+israel <- data.frame(
+  Missile = c("Jericho I", "Jericho II", "Jericho III", "LORA", "Delilah", "Rampage"),
+  Payload = c(500, 1000, 1300, 570, 50, 570),
+  Range = c(500, 1500, 6500, 400, 250, 300)
+)
 
-########
+# Convert to long format
+israel_long <- israel %>%
+  pivot_longer(cols = c(Payload, Range),
+               names_to = "Metric",
+               values_to = "Value")
 
 # Create grouped bar chart
 ggplot(israel_long, aes(x = Missile, y = Value, fill = Metric)) +
@@ -229,28 +195,35 @@ ggplot(israel_long, aes(x = Missile, y = Value, fill = Metric)) +
 
 # --- USA Ballistic Missiles ---
 
-install.packages("reshape2")   # Only run this once
-library(reshape2)
-melt(usa_missiles, id.vars = "Missile", variable.name = "Metric", value.name = "Value")
+library(tidyverse)
 
-# Create dataset
-usa_missiles <- data.frame(
-  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
-  Payload_KG = c(1100, 2800, 500, 1100),
-  Range_KM = c(12000, 12000, 300, 12000)
+library(tidyverse)
+
+# Define USA missile data
+usa <- data.frame(
+  Missile = c("Minuteman III", "Trident II D5", "Atlas", "Polaris A-3", "Pershing II", "Peacekeeper"),
+  Payload = c(1150, 2800, 1500, 800, 400, 4000),
+  Range = c(13000, 12000, 14500, 4600, 1800, 14800)
 )
 
-# Reshape using melt from reshape2
-usa_long <- melt(usa_missiles, id.vars = "Missile", 
-                 variable.name = "Metric", value.name = "Value")
+# Convert to long format
+usa_long <- usa %>%
+  pivot_longer(cols = c(Payload, Range),
+               names_to = "Metric",
+               values_to = "Value")
 
-###error usa
-usa_missiles <- data.frame(
-  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
-  Payload_KG = c(1100, 2800, 500, 1100),
-  Range_KM = c(12000, 12000, 300, 12000)
-)
-usa_long <- melt(usa_missiles, id.vars = "Missile", variable.name = "Metric", value.name = "Value")
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(
+    title = "U.S. Ballistic Missiles: Payload and Range",
+    x = "Missile System",
+    y = "Value (kg or km)",
+    fill = "Metric"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 # --- Russia Ballistic Missiles ---
 russia_missiles <- data.frame(
@@ -475,8 +448,1550 @@ ggplot(df, aes(x = country, y = percentage, fill = field)) +
             position = position_stack(vjust = 0.5), 
             color = "white", size = 4)
 
+######### COMBINED GRAPHS
+
+
+
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+######
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format using pipes
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#### russia and USA
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Run only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# USA missile data
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000),
+  Country = "USA"
+)
+
+# Russia missile data
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500),
+  Country = "Russia"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(usa_missiles, russia_missiles)
+
+# Reshape for plotting
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of USA and Russia Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#########
+
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Iran missile data
+iran_missiles <- data.frame(
+  Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+  Payload_KG = c(1000, 650, 500),
+  Range_KM = c(2000, 2500, 300),
+  Country = "Iran"
+)
+
+# Israel missile data
+israel_missiles <- data.frame(
+  Missile = c("Jericho II", "Jericho III", "LORA"),
+  Payload_KG = c(1000, 1000, 570),
+  Range_KM = c(1500, 6500, 400),
+  Country = "Israel"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(iran_missiles, israel_missiles)
+
+# Reshape to long format for ggplot
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+######
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format using pipes
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#### russia and USA
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Run only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# USA missile data
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000),
+  Country = "USA"
+)
+
+# Russia missile data
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500),
+  Country = "Russia"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(usa_missiles, russia_missiles)
+
+# Reshape for plotting
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of USA and Russia Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#########
+
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Iran missile data
+iran_missiles <- data.frame(
+  Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+  Payload_KG = c(1000, 650, 500),
+  Range_KM = c(2000, 2500, 300),
+  Country = "Iran"
+)
+
+# Israel missile data
+israel_missiles <- data.frame(
+  Missile = c("Jericho II", "Jericho III", "LORA"),
+  Payload_KG = c(1000, 1000, 570),
+  Range_KM = c(1500, 6500, 400),
+  Country = "Israel"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(iran_missiles, israel_missiles)
+
+# Reshape to long format for ggplot
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+######
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format using pipes
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#### russia and USA
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Run only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# USA missile data
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000),
+  Country = "USA"
+)
+
+# Russia missile data
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500),
+  Country = "Russia"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(usa_missiles, russia_missiles)
+
+# Reshape for plotting
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of USA and Russia Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#########
+
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Iran missile data
+iran_missiles <- data.frame(
+  Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+  Payload_KG = c(1000, 650, 500),
+  Range_KM = c(2000, 2500, 300),
+  Country = "Iran"
+)
+
+# Israel missile data
+israel_missiles <- data.frame(
+  Missile = c("Jericho II", "Jericho III", "LORA"),
+  Payload_KG = c(1000, 1000, 570),
+  Range_KM = c(1500, 6500, 400),
+  Country = "Israel"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(iran_missiles, israel_missiles)
+
+# Reshape to long format for ggplot
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+
+
+
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+                                   ######
+                                   install.packages("tidyverse")
+                                   suppressPackageStartupMessages(library(tidyverse))
+                                   
+                                   
+                                   # Create dataset for Russian missiles
+                                   russia_missiles <- data.frame(
+                                     Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+                                     Payload_KG = c(1200, 10000, 700, 450),
+                                     Range_KM = c(11000, 18000, 500, 2500)
+                                   )
+                                   
+                                   # Reshape data to long format using pipes
+                                   russia_long <- russia_missiles %>%
+                                     pivot_longer(cols = c(Payload_KG, Range_KM), 
+                                                  names_to = "Metric", 
+                                                  values_to = "Value")
+                                   
+                                   # Create grouped bar chart
+                                   ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+                                     geom_bar(stat = "identity", position = "dodge") +
+                                     labs(title = "Russian Missile Payload and Range",
+                                          x = "Missile",
+                                          y = "Value",
+                                          fill = "Metric") +
+                                     theme_minimal() +
+                                     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+                                   
+                                   #### russia and USA
+                                   
+                                   # Install and load tidyverse
+                                   install.packages("tidyverse")  # Run only once
+                                   suppressPackageStartupMessages(library(tidyverse))
+                                   
+                                   # USA missile data
+                                   usa_missiles <- data.frame(
+                                     Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+                                     Payload_KG = c(1100, 2800, 500, 1100),
+                                     Range_KM = c(12000, 12000, 300, 12000),
+                                     Country = "USA"
+                                   )
+                                   
+                                   # Russia missile data
+                                   russia_missiles <- data.frame(
+                                     Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+                                     Payload_KG = c(1200, 10000, 700, 450),
+                                     Range_KM = c(11000, 18000, 500, 2500),
+                                     Country = "Russia"
+                                   )
+                                   
+                                   # Combine both datasets
+                                   all_missiles <- bind_rows(usa_missiles, russia_missiles)
+                                   
+                                   # Reshape for plotting
+                                   missiles_long <- all_missiles %>%
+                                     pivot_longer(cols = c(Payload_KG, Range_KM),
+                                                  names_to = "Metric",
+                                                  values_to = "Value")
+                                   
+                                   # Plot: grouped bar chart with facet by Country
+                                   ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+                                     geom_bar(stat = "identity", position = "dodge") +
+                                     facet_wrap(~ Country, scales = "free_x") +
+                                     labs(title = "Comparison of USA and Russia Missile Payload & Range",
+                                          x = "Missile",
+                                          y = "Value",
+                                          fill = "Metric") +
+                                     theme_minimal() +
+                                     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+                                   #########
+                                   
+                                   
+                                   # Install and load tidyverse
+                                   install.packages("tidyverse")  # Only once
+                                   suppressPackageStartupMessages(library(tidyverse))
+                                   
+                                   # Iran missile data
+                                   iran_missiles <- data.frame(
+                                     Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+                                     Payload_KG = c(1000, 650, 500),
+                                     Range_KM = c(2000, 2500, 300),
+                                     Country = "Iran"
+                                   )
+                                   
+                                   # Israel missile data
+                                   israel_missiles <- data.frame(
+                                     Missile = c("Jericho II", "Jericho III", "LORA"),
+                                     Payload_KG = c(1000, 1000, 570),
+                                     Range_KM = c(1500, 6500, 400),
+                                     Country = "Israel"
+                                   )
+                                   
+                                   # Combine both datasets
+                                   all_missiles <- bind_rows(iran_missiles, israel_missiles)
+                                   
+                                   # Reshape to long format for ggplot
+                                   missiles_long <- all_missiles %>%
+                                     pivot_longer(cols = c(Payload_KG, Range_KM),
+                                                  names_to = "Metric",
+                                                  values_to = "Value")
+                                   
+                                   # Plot: grouped bar chart with facet by Country
+                                   ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+                                     geom_bar(stat = "identity", position = "dodge") +
+                                     facet_wrap(~ Country, scales = "free_x") +
+                                     labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+                                          x = "Missile",
+                                          y = "Value",
+                                          fill = "Metric") +
+                                     theme_minimal() +
+                                     theme(axis.text.x = element_text(angle = 45, hjust = 1))
+                                   
+                                   
+
+
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+######
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format using pipes
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#### russia and USA
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Run only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# USA missile data
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000),
+  Country = "USA"
+)
+
+# Russia missile data
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500),
+  Country = "Russia"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(usa_missiles, russia_missiles)
+
+# Reshape for plotting
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of USA and Russia Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#########
+
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Iran missile data
+iran_missiles <- data.frame(
+  Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+  Payload_KG = c(1000, 650, 500),
+  Range_KM = c(2000, 2500, 300),
+  Country = "Iran"
+)
+
+# Israel missile data
+israel_missiles <- data.frame(
+  Missile = c("Jericho II", "Jericho III", "LORA"),
+  Payload_KG = c(1000, 1000, 570),
+  Range_KM = c(1500, 6500, 400),
+  Country = "Israel"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(iran_missiles, israel_missiles)
+
+# Reshape to long format for ggplot
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##### CHINA AND NK
+
+# 1. Install reshape2 (only once)
+install.packages("reshape2")
+
+# 2. Load the package
+library(reshape2)
+
+# 3. Create your dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# 4. Melt the data
+usa_long <- melt(usa_missiles, 
+                 id.vars = "Missile", 
+                 variable.name = "Metric", 
+                 value.name = "Value")
+
+# 5. View the result
+print(usa_long)
+
+# 1. Install tidyverse
+install.packages("tidyverse")
+
+# 2. Load tidyverse (includes tidyr)
+library(tidyverse)
+
+# 3. Reshape the data
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = -Missile,
+               names_to = "Metric",
+               values_to = "Value")
+
+# 4. View result
+print(usa_long)
+
+
+# Install if needed (only once)
+install.packages("reshape2")
+
+# Load the package quietly
+suppressPackageStartupMessages(library(reshape2))
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+#####
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000)
+)
+
+# Reshape data to long format
+usa_long <- usa_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(usa_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "USA Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+####
+
+# Install and load required packages
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angl
+                                   
+######
+install.packages("tidyverse")
+suppressPackageStartupMessages(library(tidyverse))
+
+
+# Create dataset for Russian missiles
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500)
+)
+
+# Reshape data to long format using pipes
+russia_long <- russia_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM), 
+               names_to = "Metric", 
+               values_to = "Value")
+
+# Create grouped bar chart
+ggplot(russia_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Russian Missile Payload and Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#### russia and USA
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Run only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# USA missile data
+usa_missiles <- data.frame(
+  Missile = c("Minuteman III", "Trident II", "ATACMS", "Sentinel"),
+  Payload_KG = c(1100, 2800, 500, 1100),
+  Range_KM = c(12000, 12000, 300, 12000),
+  Country = "USA"
+)
+
+# Russia missile data
+russia_missiles <- data.frame(
+  Missile = c("Topol-M", "RS-28 Sarmat", "Iskander-M", "Kalibr"),
+  Payload_KG = c(1200, 10000, 700, 450),
+  Range_KM = c(11000, 18000, 500, 2500),
+  Country = "Russia"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(usa_missiles, russia_missiles)
+
+# Reshape for plotting
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of USA and Russia Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#########
+
+
+# Install and load tidyverse
+install.packages("tidyverse")  # Only once
+suppressPackageStartupMessages(library(tidyverse))
+
+# Iran missile data
+iran_missiles <- data.frame(
+  Missile = c("Shahab-3", "Sejjil", "Fateh-110"),
+  Payload_KG = c(1000, 650, 500),
+  Range_KM = c(2000, 2500, 300),
+  Country = "Iran"
+)
+
+# Israel missile data
+israel_missiles <- data.frame(
+  Missile = c("Jericho II", "Jericho III", "LORA"),
+  Payload_KG = c(1000, 1000, 570),
+  Range_KM = c(1500, 6500, 400),
+  Country = "Israel"
+)
+
+# Combine both datasets
+all_missiles <- bind_rows(iran_missiles, israel_missiles)
+
+# Reshape to long format for ggplot
+missiles_long <- all_missiles %>%
+  pivot_longer(cols = c(Payload_KG, Range_KM),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Plot: grouped bar chart with facet by Country
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Country, scales = "free_x") +
+  labs(title = "Comparison of Iran and Israel Missile Payload & Range",
+       x = "Missile",
+       y = "Value",
+       fill = "Metric") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##### CHINA /NORTH KOREA #####
+
+library(tidyverse)
+
+# Step 1: Define missile data for China
+china <- data.frame(
+  Country = "China",
+  Missile = c("DF-11", "DF-15", "DF-21", "DF-26", "DF-31", "DF-41"),
+  Payload = c(500, 600, 600, 1800, 1050, 2500),
+  Range = c(600, 900, 1750, 4000, 11200, 15000)
+)
+
+# Step 2: Define missile data for North Korea
+north_korea <- data.frame(
+  Country = "North Korea",
+  Missile = c("Hwasong-5", "Hwasong-7", "Hwasong-12", "Hwasong-14", "Hwasong-15", "Hwasong-17"),
+  Payload = c(1000, 1200, 500, 500, 1000, 2000),
+  Range = c(300, 700, 4500, 10000, 13000, 15000)
+)
+
+# Step 3: Combine both datasets
+missiles_combined <- bind_rows(china, north_korea)
+
+# Step 4: Reshape into long format
+missiles_long <- missiles_combined %>%
+  pivot_longer(cols = c(Payload, Range),
+               names_to = "Metric",
+               values_to = "Value")
+
+# Step 5: Plot grouped bar chart
+ggplot(missiles_long, aes(x = Missile, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~Country, scales = "free_x") +
+  labs(
+    title = "Chinese and North Korean Missile Capabilities: Payload vs Range",
+    x = "Missile System",
+    y = "Value (kg or km)",
+    fill = "Metric"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
 
 ##### the amount of missles that each country have (aproximate)
+
+# Load necessary libraries
+library(tidyverse)
+
+# Step 1: Define missile counts for each country
+missile_counts <- data.frame(
+  Country = c("Israel", "Iran", "USA", "Russia", "China", "North Korea"),
+  Number_of_Missiles = c(6, 10, 15, 20, 12, 8)  # You can update these with real figures if needed
+)
+
+# Step 2: View the dataset
+print(missile_counts)
+
+# Step 3: Plot a bar chart
+ggplot(missile_counts, aes(x = reorder(Country, -Number_of_Missiles), y = Number_of_Missiles, fill = Country)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Number of Known Missile Systems by Country",
+    x = "Country",
+    y = "Number of Missile Systems"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1))
 
 
 
